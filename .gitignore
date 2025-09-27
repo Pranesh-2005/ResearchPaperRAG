@@ -1,2 +1,4 @@
 storage/
 .env
+__pycache__/
+*pyc
