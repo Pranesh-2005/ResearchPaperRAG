@@ -117,3 +117,79 @@ def query_paper(session_id, user_message, chat_history):
     chat_history.append((user_message, answer))
 
     return chat_history, ""
+
+
+# === GRADIO UI ===
+with gr.Blocks() as demo:
+    gr.Markdown("## 📄 Research Paper Chatbot (RAG + OpenRouter)")
+
+    with gr.Row():
+        pdf_input = gr.File(label="Upload Research Paper (PDF)", file_types=[".pdf"])
+        session_box = gr.Textbox(label="Session ID", interactive=False)
+
+    chatbot = gr.Chatbot(label="Chat about your paper", height=400)
+    user_message = gr.Textbox(label="Ask a question", placeholder="What is this paper about?")
+
+    with gr.Row():
+        upload_btn = gr.Button("Upload Paper", variant="primary")
+        ask_btn = gr.Button("Send Question")
+        clear_btn = gr.Button("Clear Chat")
+
+    # Store chat history and session
+    state_chat = gr.State([])
+    state_session = gr.State("")
+
+    # Upload button functionality
+    def handle_upload(pdf_file):
+        status, session_id, chat_history = process_pdf(pdf_file)
+        return status, session_id, chat_history
+
+    upload_btn.click(
+        fn=handle_upload,
+        inputs=[pdf_input],
+        outputs=[session_box, state_session, chatbot]
+    )
+
+    # Ask button functionality
+    def handle_question(session_id, message, chat_history):
+        updated_chat, _ = query_paper(session_id, message, chat_history)
+        return updated_chat, ""
+
+    ask_btn.click(
+        fn=handle_question,
+        inputs=[state_session, user_message, chatbot],
+        outputs=[chatbot, user_message]
+    ).then(
+        lambda chat: chat,
+        inputs=[chatbot],
+        outputs=[state_chat]
+    )
+
+    # Submit on enter
+    user_message.submit(
+        fn=handle_question,
+        inputs=[state_session, user_message, chatbot],
+        outputs=[chatbot, user_message]
+    ).then(
+        lambda chat: chat,
+        inputs=[chatbot],
+        outputs=[state_chat]
+    )
+
+    # Clear chat
+    def clear_chat():
+        return [], []
+
+    clear_btn.click(
+        fn=clear_chat,
+        outputs=[chatbot, state_chat]
+    )
+
+    # Sync chat state with chatbot
+    state_chat.change(
+        lambda chat: chat,
+        inputs=[state_chat],
+        outputs=[chatbot]
+    )
+
+demo.launch(debug=True)
