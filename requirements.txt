@@ -1,0 +1,14 @@
+gradio
+PyPDF2
+python-dotenv
+requests
+langchain
+langchain-community
+langchain-huggingface
+sentence-transformers
+faiss-cpu
+numpy
+torch
+transformers
+tf-keras
+huggingface-hub
