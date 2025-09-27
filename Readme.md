@@ -1,5 +1,3 @@
-# ResearchPaperRAG
-
 # 📄 ResearchPaperRAG
 
 **ResearchPaperRAG** is a cutting-edge tool designed to help you analyze and interact with research papers using Retrieval-Augmented Generation (RAG). By leveraging state-of-the-art language models and vector search, it allows users to upload PDFs and ask questions, receiving insightful, context-aware answers.
