@@ -56,3 +56,64 @@ def process_pdf(pdf_file):
 
     chat_history = [("System", "Paper uploaded and processed. You can now ask questions.")]
     return f"Paper uploaded successfully. Session ID: {session_id}", session_id, chat_history
+
+# === QUERY FUNCTION ===
+def query_paper(session_id, user_message, chat_history):
+    if not session_id or not os.path.exists(os.path.join(STORAGE_DIR, session_id)):
+        chat_history = chat_history or []
+        chat_history.append(("System", "Session expired or not found. Upload the paper again."))
+        return chat_history, ""
+
+    if not user_message.strip():
+        return chat_history, ""
+
+    session_path = os.path.join(STORAGE_DIR, session_id)
+    embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
+    db = FAISS.load_local(session_path, embeddings, allow_dangerous_deserialization=True)
+    retriever = db.as_retriever(search_kwargs={"k": 3})
+
+    # Use invoke() instead of deprecated method
+    docs = retriever.invoke(user_message)
+    context = "\n\n".join([d.page_content for d in docs])
+
+    prompt = f"""
+    You are an AI assistant. Explain the following research paper content in simple terms and answer the question.
+    Use your own knowledge also and make it more technical but simpler explanation should be like professor with 
+    high knowledge but teaches in awesome way with more technical stuff but easier.
+    Context from paper:
+    {context}
+    Question: {user_message}
+    Answer:
+    """
+
+    headers = {
+        "Authorization": f"Bearer {OPENROUTER_API_KEY}",
+        "Content-Type": "application/json"
+    }
+    payload = {
+        "model": OPENROUTER_MODEL,
+        "messages": [
+            {
+                "role": "system",
+                "content": "You are a helpful research paper explainer. Explain all concepts clearly with technical aspects but in an easy way."
+            },
+            {"role": "user", "content": prompt}
+        ]
+    }
+
+    try:
+        response = requests.post("https://openrouter.ai/api/v1/chat/completions",
+                                 headers=headers, json=payload)
+
+        if response.status_code == 200:
+            answer = response.json()["choices"][0]["message"]["content"].strip()
+        else:
+            answer = f"Error: {response.status_code} - {response.text}"
+    except Exception as e:
+        answer = f"Error: {str(e)}"
+
+    # Update chat history (tuple format)
+    chat_history = chat_history or []
+    chat_history.append((user_message, answer))
+
+    return chat_history, ""
