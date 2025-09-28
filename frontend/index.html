@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Research Paper RAG</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; }
+    #chat { border: 1px solid #ccc; padding: 10px; height: 300px; overflow-y: auto; margin-bottom: 10px; }
+    .msg { margin: 5px 0; }
+    .user { font-weight: bold; color: blue; }
+    .bot { font-weight: bold; color: green; }
+  </style>
+</head>
+<body>
+  <h1>Research Paper RAG</h1>
+
+  <h3>Upload PDF</h3>
+  <input type="file" id="pdfInput">
+  <button onclick="uploadPDF()">Upload</button>
+  <p id="status"></p>
+
+  <h3>Chat</h3>
+  <div id="chat"></div>
+  <input type="text" id="message" placeholder="Ask a question">
+  <button onclick="ask()">Send</button>
+  <button onclick="clearChat()">Clear Chat</button>
+
+  <script>
+    const API_BASE = "http://127.0.0.1:8000"; // Change if backend hosted elsewhere
+    let chatHistory = [];
+    let sessionId = null;
+
+    async function uploadPDF() {
+      const fileInput = document.getElementById("pdfInput");
+      if (!fileInput.files.length) {
+        alert("Select a PDF first!");
+        return;
+      }
+      const formData = new FormData();
+      formData.append("file", fileInput.files[0]);
+      document.getElementById("status").innerText = "Uploading...";
+
+      const res = await fetch(`${API_BASE}/upload`, { method: "POST", body: formData });
+      const data = await res.json();
+      if (res.ok) {
+        sessionId = data.session_id;
+        chatHistory = data.chat_history || [];
+        document.getElementById("status").innerText = "Upload successful!";
+        renderChat();
+      } else {
+        document.getElementById("status").innerText = "Error: " + data.detail;
+      }
+    }
+
+    async function ask() {
+      const msg = document.getElementById("message").value;
+      if (!msg) return;
+      const res = await fetch(`${API_BASE}/ask?message=${encodeURIComponent(msg)}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(chatHistory)
+      });
+      const data = await res.json();
+      if (res.ok) {
+        chatHistory = data.chat_history;
+        renderChat();
+        document.getElementById("message").value = "";
+      } else {
+        alert("Error: " + data.detail);
+      }
+    }
+
+    async function clearChat() {
+      const res = await fetch(`${API_BASE}/clear`, { method: "POST" });
+      const data = await res.json();
+      if (res.ok) {
+        chatHistory = [];
+        renderChat();
+      }
+    }
+
+    function renderChat() {
+      const chatBox = document.getElementById("chat");
+      chatBox.innerHTML = "";
+      chatHistory.forEach(([user, bot]) => {
+        if (user) chatBox.innerHTML += `<div class="msg user">You: ${user}</div>`;
+        if (bot) chatBox.innerHTML += `<div class="msg bot">Bot: ${bot}</div>`;
+      });
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }
+  </script>
+</body>
+</html>
