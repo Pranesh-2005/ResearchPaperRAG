@@ -1,32 +1,395 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>Research Paper RAG</title>
   <style>
-    body { font-family: Arial, sans-serif; padding: 20px; }
-    #chat { border: 1px solid #ccc; padding: 10px; height: 300px; overflow-y: auto; margin-bottom: 10px; }
-    .msg { margin: 5px 0; }
-    .user { font-weight: bold; color: blue; }
-    .bot { font-weight: bold; color: green; }
+:root {
+  --color-bg: #f6f7fb;
+  --color-surface: #fffaf7;
+  --color-text: #232946;
+  --color-primary: #6a7fd1;
+  --color-accent: #ff6b6b;
+  --color-teal: #43e6d6;
+  --color-secondary: #f7c873;
+  --radius: 18px;
+  --shadow-md: 0 8px 32px rgba(35,41,70,0.10);
+  --shadow-lg: 0 24px 48px rgba(67,230,214,0.10);
+}
+
+html, body {
+  height: 100%;
+  box-sizing: border-box;
+}
+
+*, *:before, *:after {
+  box-sizing: inherit;
+}
+
+body {
+  margin: 0;
+  font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
+  color: var(--color-text);
+  background: var(--color-bg);
+  line-height: 1.6;
+  letter-spacing: 0.1px;
+}
+
+.wrap {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 40px 20px 56px;
+}
+
+header.app-header {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 32px;
+  align-items: flex-start;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.brand-badge {
+  width: 18px;
+  height: 36px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, var(--color-teal), var(--color-primary));
+  box-shadow: var(--shadow-md);
+}
+
+h1 {
+  margin: 0;
+  font-family: 'Montserrat', 'Georgia', serif;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  font-size: clamp(28px, 3vw, 38px);
+  background: linear-gradient(90deg, var(--color-primary), var(--color-teal));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.sub {
+  color: #6a7fd1;
+  font-size: 16px;
+  max-width: 60ch;
+  font-weight: 500;
+}
+
+.grid {
+  display: grid;
+  gap: 28px;
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 960px) {
+  .grid {
+    grid-template-columns: 370px 1fr;
+    gap: 32px;
+  }
+}
+
+.card {
+  background: var(--color-surface);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-md);
+  padding: 24px;
+  border: none;
+  width: 100%;
+  max-width: 100%;
+  overflow: hidden;
+}
+
+.card:hover {
+  box-shadow: var(--shadow-lg);
+}
+
+.card h3 {
+  margin: 0 0 16px 0;
+  font-family: 'Montserrat', 'Georgia', serif;
+  font-weight: 700;
+  font-size: 22px;
+  letter-spacing: -0.01em;
+  color: var(--color-primary);
+}
+
+.hint {
+  font-size: 14px;
+  color: #6a7fd1;
+  margin-top: 8px;
+  font-style: italic;
+}
+
+.field {
+  display: grid;
+  gap: 10px;
+  margin-bottom: 16px;
+  width: 100%;
+}
+
+label {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--color-teal);
+}
+
+input[type="file"],
+input[type="text"] {
+  width: 100%;
+  background: #f6f7fb;
+  border: 2px solid var(--color-teal);
+  border-radius: 14px;
+  padding: 12px 14px;
+  font-size: 15px;
+  outline: none;
+  box-sizing: border-box;
+  max-width: 100%;
+}
+
+input[type="file"]:focus,
+input[type="text"]:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(106,127,209,0.18);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+  width: 100%;
+}
+
+.btn {
+  border: none;
+  border-radius: 14px;
+  padding: 12px 20px;
+  font-weight: 700;
+  font-size: 15px;
+  cursor: pointer;
+  user-select: none;
+  outline: none;
+  box-shadow: 0 2px 8px rgba(67,230,214,0.10);
+  max-width: 100%;
+}
+
+.btn:focus-visible {
+  box-shadow: 0 0 0 3px rgba(67,230,214,0.24);
+}
+
+.btn:active {
+  transform: translateY(1px);
+}
+
+.btn-primary {
+  background: linear-gradient(90deg, var(--color-primary), var(--color-teal));
+  color: #fff;
+  box-shadow: 0 8px 18px rgba(106,127,209,0.18);
+  border: none;
+}
+
+.btn-primary:hover {
+  filter: brightness(1.08);
+  box-shadow: 0 12px 24px rgba(67,230,214,0.18);
+}
+
+.btn-accent {
+  background: linear-gradient(90deg, var(--color-accent), var(--color-secondary));
+  color: #fff;
+  box-shadow: 0 8px 18px rgba(255,107,107,0.18);
+  border: none;
+}
+
+.btn-accent:hover {
+  filter: brightness(1.08);
+  box-shadow: 0 12px 24px rgba(247,200,115,0.18);
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--color-primary);
+  border: 2px solid var(--color-primary);
+}
+
+.chat-card {
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  gap: 16px;
+  min-height: 440px;
+  width: 100%;
+  max-width: 100%;
+  overflow: hidden;
+}
+
+#chat {
+  border: none;
+  border-radius: 18px;
+  padding: 18px;
+  height: 380px;
+  overflow-y: auto;
+  background: linear-gradient(180deg, #fffaf7 0%, #f6f7fb 100%);
+  box-shadow: inset 0 1px 0 rgba(67,230,214,0.10);
+  width: 100%;
+  max-width: 100%;
+}
+
+@media (min-width: 960px) {
+  #chat {
+    height: 520px;
+  }
+}
+
+.msg {
+  display: grid;
+  grid-template-columns: 70px 1fr;
+  align-items: flex-start;
+  gap: 14px;
+  margin: 18px 0;
+  width: 100%;
+}
+
+.label {
+  margin-top: 6px;
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  opacity: 0.85;
+  word-break: break-word;
+}
+
+.label.user { color: var(--color-accent); }
+.label.bot { color: var(--color-teal); }
+
+.bubble {
+  background: #fffaf7;
+  border: 2px solid var(--color-teal);
+  border-radius: 14px;
+  padding: 16px 18px;
+  box-shadow: var(--shadow-md);
+  font-size: 16px;
+  word-break: break-word;
+  overflow-wrap: break-word;
+  max-width: 100%;
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+.bubble.user {
+  background: linear-gradient(90deg, #fffaf7 60%);
+  border-color: var(--color-secondary);
+  color: var(--color-accent);
+}
+
+.bubble.bot {
+  background: linear-gradient(90deg, #f6f7fb 60%);
+  border-color: var(--color-teal);
+  color: var(--color-primary);
+}
+
+.markdown :where(p, ul, ol, pre, code, blockquote, h1, h2, h3, h4) {
+  margin: 0 0 10px 0;
+}
+
+.markdown p { line-height: 1.6; }
+
+.markdown ul, .markdown ol {
+  padding-left: 18px;
+}
+
+.markdown code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  background: rgba(67,230,214,0.08);
+  padding: 2px 6px;
+  border-radius: 8px;
+  font-size: 14px;
+}
+
+.markdown pre {
+  background: rgba(67,230,214,0.08);
+  padding: 12px;
+  border-radius: 12px;
+  overflow: auto;
+}
+
+.chat-input-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 14px;
+  align-items: center;
+  width: 100%;
+}
+
+.status {
+  font-size: 14px;
+  color: var(--color-primary);
+  font-weight: 600;
+  word-break: break-word;
+}
   </style>
+  <!-- Add Google Fonts for Montserrat and Inter -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Montserrat:wght@700;800&display=swap" rel="stylesheet">
 </head>
 <body>
-  <h1>📄 Research Paper Chatbot (RAG)</h1>
+  <div class="wrap">
+    <header class="app-header" role="banner">
+      <div class="brand">
+        <span class="brand-badge" aria-hidden="true"></span>
+        <h1>Research Paper Chatbot (RAG)</h1>
+      </div>
+      <p class="sub">
+        Upload a PDF, then ask questions. Answers are grounded in the uploaded paper and rendered with Markdown.
+      </p>
+    </header>
 
-  <h3>Upload PDF</h3>
-  <input type="file" id="pdfInput">
-  <button onclick="uploadPDF()">Upload</button>
-  <p id="status"></p>
+    <main class="grid" role="main">
+      <section class="card" aria-labelledby="upload-title">
+        <h3 id="upload-title">Upload PDF</h3>
+        <div class="field">
+          <label for="pdfInput">Choose a PDF file</label>
+          <input type="file" id="pdfInput" accept="application/pdf" aria-describedby="file-hint" />
+          <div id="file-hint" class="hint">We only process the file locally by sending it to your API.</div>
+        </div>
+        <div class="actions">
+          <button class="btn btn-primary" onclick="uploadPDF()">Upload</button>
+          <span id="status" class="status" aria-live="polite"></span>
+        </div>
+      </section>
 
-  <h3>Chat</h3>
-  <div id="chat"></div>
-  <input type="text" id="message" placeholder="Ask a question">
-  <button onclick="ask()">Send</button>
-  <button onclick="clearChat()">Clear Chat</button>
+      <section class="card chat-card" aria-labelledby="chat-title">
+        <h3 id="chat-title">Chat</h3>
+
+        <div
+          id="chat"
+          role="log"
+          aria-live="polite"
+          aria-relevant="additions"
+          aria-label="Chat history"
+        ></div>
+
+        <div class="chat-input-row">
+          <input type="text" id="message" placeholder="Ask a question" aria-label="Message" />
+          <div class="actions">
+            <button class="btn btn-primary" onclick="ask()">Send</button>
+            <button class="btn btn-accent" onclick="clearChat()">Clear Chat</button>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 
   <script>
-    const API_BASE = "http://127.0.0.1:8000"; 
+    const API_BASE = "http://127.0.0.1:8000";
     let chatHistory = [];
     let sessionId = null;
 
@@ -40,7 +403,7 @@
       formData.append("file", fileInput.files[0]);
       document.getElementById("status").innerText = "Uploading...";
 
-      const res = await fetch(`${API_BASE}/upload`, { method: "POST", body: formData });
+      const res = await fetch(API_BASE + "/upload", { method: "POST", body: formData });
       const data = await res.json();
       if (res.ok) {
         sessionId = data.session_id;
@@ -86,8 +449,42 @@
       const chatBox = document.getElementById("chat");
       chatBox.innerHTML = "";
       chatHistory.forEach(([user, bot]) => {
-        if (user) chatBox.innerHTML += `<div class="msg user">You: ${user}</div>`;
-        if (bot) chatBox.innerHTML += `<div class="msg bot">Bot: ${bot}</div>`;
+        if (user) {
+          const row = document.createElement("div");
+          row.className = "msg user-row";
+
+          const label = document.createElement("div");
+          label.className = "label user";
+          label.textContent = "You";
+
+          const bubble = document.createElement("div");
+          bubble.className = "bubble user";
+          bubble.textContent = user;
+
+          row.appendChild(label);
+          row.appendChild(bubble);
+          chatBox.appendChild(row);
+        }
+        if (bot) {
+          const row = document.createElement("div");
+          row.className = "msg bot-row";
+
+          const label = document.createElement("div");
+          label.className = "label bot";
+          label.textContent = "Bot";
+
+          const bubble = document.createElement("div");
+          bubble.className = "bubble bot markdown";
+          try {
+            bubble.innerHTML = window.marked.parse(bot);
+          } catch (e) {
+            bubble.textContent = bot;
+          }
+
+          row.appendChild(label);
+          row.appendChild(bubble);
+          chatBox.appendChild(row);
+        }
       });
       chatBox.scrollTop = chatBox.scrollHeight;
     }
