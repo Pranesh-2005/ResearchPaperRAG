@@ -1,83 +1,140 @@
 # 📄 ResearchPaperRAG
 
-**ResearchPaperRAG** is a cutting-edge tool designed to help you analyze and interact with research papers using Retrieval-Augmented Generation (RAG). By leveraging state-of-the-art language models and vector search, it allows users to upload PDFs and ask questions, receiving insightful, context-aware answers.
+**ResearchPaperRAG** is a cutting-edge tool designed to help you analyze and interact with research papers using Retrieval-Augmented Generation (RAG). By leveraging state-of-the-art language models and vector search, it allows users to upload PDFs and ask questions, receiving insightful answers in real-time. With a modern web interface and backend powered by OpenRouter.ai and HuggingFace, ResearchPaperRAG streamlines research workflows for academics, students, and enthusiasts.
 
 ---
 
-## ✨ Features
+## 🚀 Features
 
-- **PDF Upload**: Seamlessly upload and process research papers in PDF format.
-- **Retrieval-Augmented Generation**: Combines retrieval of relevant paper sections with generative AI for precise answers.
-- **Fast & Accurate**: Utilizes FAISS for high-speed vector search and HuggingFace embeddings for semantic understanding.
-- **User-friendly Interface**: Simple UI with [Gradio](https://gradio.app/) for easy interaction.
-- **Secure API Integration**: Connects to OpenRouter.ai for model inference using your API key.
-
----
-
-## ⚡ Installation
-
-1. **Clone the repository**
-    ```bash
-    git clone https://github.com/yourusername/ResearchPaperRAG.git
-    cd ResearchPaperRAG
-    ```
-
-2. **Create a virtual environment**
-    ```bash
-    python -m venv venv
-    source venv/bin/activate    # On Windows use: venv\Scripts\activate
-    ```
-
-3. **Install dependencies**
-    ```bash
-    pip install -r requirements.txt
-    ```
-
-4. **Set up your environment variables**
-    - Copy `.env.example` to `.env` and add your [OpenRouter.ai](https://openrouter.ai/) API key:
-      ```
-      OPENROUTER_API_KEY=<your-OpenRouter.ai-api-key>
-      ```
+- **PDF Upload & Parsing:** Seamlessly upload research papers in PDF format.
+- **Retrieval-Augmented Generation:** Ask questions and get context-aware answers sourced directly from your paper.
+- **Chat-like Interface:** Intuitive frontend that feels like chatting with your research assistant.
+- **State-of-the-Art Embeddings:** Uses powerful language models via HuggingFace for document understanding.
+- **Fast Vector Search:** Efficient document chunking and retrieval using FAISS.
+- **Cross-Platform Frontend:** Responsive web app with PWA support for desktop & mobile.
+- **Easy Backend Setup:** Gradio and Flask backend, with API integration for OpenRouter.ai.
+- **Secure API Key Management:** Environment variable support for sensitive credentials.
 
 ---
 
-## 🚀 Usage
+## 🛠️ Installation
 
-1. **Run the app**
-    ```bash
-    python app.py
-    ```
+### Prerequisites
 
-2. **Open your browser**
-    - Access the Gradio interface at the displayed URL.
+- Python 3.8+
+- Node.js & npm (for frontend development)
+- [OpenRouter.ai API Key](https://openrouter.ai/)
+- [HuggingFace account](https://huggingface.co/) (optional, for advanced features)
 
-3. **Upload a research paper**
-    - Click "Upload" and select your PDF.
+### 1. Clone the Repository
 
-4. **Ask questions**
-    - Type your question about the paper and get context-aware responses!
+```bash
+git clone https://github.com/yourusername/ResearchPaperRAG.git
+cd ResearchPaperRAG
+```
+
+### 2. Backend Setup
+
+```bash
+python -m venv venv
+source venv/bin/activate        # On Windows: venv\Scripts\activate
+pip install -r requirements.txt
+```
+
+Copy `.env.example` to `.env` and add your OpenRouter API key:
+
+```env
+OPENROUTER_API_KEY=your-OpenRouter.ai-api-key
+```
+
+Start the backend:
+
+```bash
+python gradiobackend.py
+# Or, if using app.py:
+python app.py
+```
+
+### 3. Frontend Setup
+
+```bash
+cd frontend
+npm install           # If using build tools
+# Or simply open index.html in your browser for basic usage
+```
+
+---
+
+## 💡 Usage
+
+1. **Start the Backend:**  
+   Run `python gradiobackend.py` or `python app.py` to start the API server.
+
+2. **Open the Frontend:**  
+   Open `frontend/index.html` in your browser, or deploy the frontend as a static site.
+
+3. **Upload a PDF:**  
+   Use the interface to upload your research paper.
+
+4. **Ask Questions:**  
+   Type your queries into the chat and receive answers sourced from your document!
+
+5. **API Usage:**  
+   You can also interact directly with the API for custom workflows.
 
 ---
 
 ## 🤝 Contributing
 
-Contributions are welcome! To contribute:
+Contributions are welcome! To get started:
 
-1. Fork the repository.
-2. Create a feature branch (`git checkout -b feature-name`).
-3. Commit your changes.
-4. Push to your branch (`git push origin feature-name`).
-5. Open a Pull Request.
+1. **Fork the repository**
+2. **Create a new branch:**  
+   `git checkout -b feature/your-feature`
+3. **Commit your changes**
+4. **Push your branch:**  
+   `git push origin feature/your-feature`
+5. **Open a Pull Request**
 
----
-
-## 📜 License
-
-This project is licensed under the [MIT License](LICENSE).
+**Issues and suggestions** can be posted in the [GitHub Issues](https://github.com/yourusername/ResearchPaperRAG/issues) section.
 
 ---
 
-> Made with ❤️ for researchers and AI enthusiasts!
+## 📄 License
+
+This project is licensed under the **MIT License**.  
+See [LICENSE](LICENSE) for more details.
+
+---
+
+> **Made with ❤️ for researchers, students, and curious minds everywhere.**
+
+---
+
+## 📁 Project Structure
+
+```
+ResearchPaperRAG/
+├── .env.example
+├── app.py
+├── gradiobackend.py
+├── frontend/
+│   ├── index.html
+│   ├── manifest.json
+│   ├── script.js
+│   ├── style.css
+└── README.md
+```
+
+---
+
+## 📬 Contact
+
+For questions or support, reach out via [GitHub Issues](https://github.com/yourusername/ResearchPaperRAG/issues).
+
+---
+
+Happy researching! 🚀
 
 ## License
 This project is licensed under the **MIT** License.
