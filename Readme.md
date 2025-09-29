@@ -96,7 +96,7 @@ Contributions are welcome! To get started:
    `git push origin feature/your-feature`
 5. **Open a Pull Request**
 
-**Issues and suggestions** can be posted in the [GitHub Issues](https://github.com/yourusername/ResearchPaperRAG/issues) section.
+**Issues and suggestions** can be posted in the [GitHub Issues](https://github.com/pranesh-2005/ResearchPaperRAG/issues) section.
 
 ---
 
